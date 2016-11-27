@@ -42,10 +42,10 @@ golang [cron](https://en.wikipedia.org/wiki/Cron) like service
         "time"
         "strings"
         "strconv"
-        "github.com/e154/cron"
+        c "github.com/e154/cron"
     )
     
-    cron := NewCron()
+    cron := c.NewCron()
     
     cron.NewTask("* * * * * *", func(){log.Println("task1")})
     cron.NewTask("10,44 * * * * *", func(){log.Println("task2")})
