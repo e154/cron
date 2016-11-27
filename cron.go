@@ -199,7 +199,7 @@ func (c *Cron) timePrepare() {
 		if !task.enabled {
 			continue
 		}
-		task.exec()
+		go task.exec()
 	}
 }
 
