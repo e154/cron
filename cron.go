@@ -5,6 +5,7 @@ import (
 	"strings"
 	"strconv"
 	"log"
+	"sync"
 )
 
 const (
@@ -18,11 +19,13 @@ const (
 
 func NewCron() *Cron {
 	return &Cron{
+		mutex: &sync.Mutex{},
 		tasks: make(map[*Task]bool),
 	}
 }
 
 type Cron struct {
+	mutex     *sync.Mutex
 	tasks     map[*Task]bool
 	isRun     bool
 	quit      chan bool
@@ -171,7 +174,12 @@ func (c *Cron) timeParser(t string) (result map[int][]int) {
 func (c *Cron) NewTask(t string, h func()) *Task {
 	_time := c.timeParser(t)
 	task := &Task{_time: _time, _func:h, cron: c, enabled: true}
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	c.tasks[task] = false
+
 	return task
 }
 
@@ -179,6 +187,9 @@ func (c *Cron) RemoveTask(task *Task) {
 	if _, ok := c.tasks[task]; !ok {
 		return
 	}
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
 	delete(c.tasks, task)
 }
@@ -192,6 +203,9 @@ func (c *Cron) timePrepare() {
 	c.weekday = _time.Weekday()
 	c.day = _time.Day()
 	c.month = _time.Month()
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
 	// tasks
 	//-----------------------------------
