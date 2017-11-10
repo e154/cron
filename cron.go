@@ -29,12 +29,6 @@ type Cron struct {
 	tasks     map[*Task]bool
 	isRun     bool
 	quit      chan bool
-	second    int
-	min       int
-	hour      int
-	weekday   time.Weekday
-	day       int
-	month     time.Month
 	StartTime time.Time
 	Uptime    time.Duration
 }
@@ -194,18 +188,16 @@ func (c *Cron) RemoveTask(task *Task) {
 	delete(c.tasks, task)
 }
 
-func (c *Cron) timePrepare() {
-	_time := time.Now()
-	c.Uptime = _time.Sub(c.StartTime)
-	c.second = _time.Second()
-	c.min = _time.Minute()
-	c.hour = _time.Hour()
-	c.weekday = _time.Weekday()
-	c.day = _time.Day()
-	c.month = _time.Month()
+func (c *Cron) timePrepare(t time.Time) {
 
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	c.Uptime = t.Sub(c.StartTime)
+	var ct *Timer = &Timer{}
+	ct.second = t.Second()
+	ct.min = t.Minute()
+	ct.hour = t.Hour()
+	ct.weekday = t.Weekday()
+	ct.day = t.Day()
+	ct.month = t.Month()
 
 	// tasks
 	//-----------------------------------
@@ -213,7 +205,7 @@ func (c *Cron) timePrepare() {
 		if !task.enabled {
 			continue
 		}
-		go task.exec()
+		go task.exec(ct)
 	}
 }
 
@@ -229,8 +221,8 @@ func (c *Cron) Run() *Cron {
 		for {
 
 			select {
-			case <- ticker.C:
-				c.timePrepare()
+			case t := <- ticker.C:
+				c.timePrepare(t)
 			case <- c.quit:
 				ticker.Stop()
 				close(c.quit)

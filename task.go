@@ -41,14 +41,14 @@ func (t *Task) GetTime() (time string) {
 	return
 }
 
-func (t *Task) exec() {
+func (t *Task) exec(_timer *Timer) {
 
 	//log.Println("exec")
 
 	// WEEKDAY
 	exist := false
 	for _, weekday := range t._time[WEEKDAY] {
-		if weekday == int(t.cron.weekday) {
+		if weekday == int(_timer.weekday) {
 			exist = true
 			break
 		}
@@ -63,7 +63,7 @@ func (t *Task) exec() {
 	// MONTH
 	exist = false
 	for _, month := range t._time[MONTH] {
-		if month == int(t.cron.month) {
+		if month == int(_timer.month) {
 			exist = true
 			break
 		}
@@ -77,7 +77,7 @@ func (t *Task) exec() {
 	// DAY
 	exist = false
 	for _, day := range t._time[DAY] {
-		if day == t.cron.day {
+		if day == _timer.day {
 			exist = true
 			break
 		}
@@ -91,7 +91,7 @@ func (t *Task) exec() {
 	// HOUR
 	exist = false
 	for _, hour := range t._time[HOUR] {
-		if hour == t.cron.hour {
+		if hour == _timer.hour {
 			exist = true
 			break
 		}
@@ -105,7 +105,7 @@ func (t *Task) exec() {
 	// MINUTES
 	exist = false
 	for _, min := range t._time[MINUTE] {
-		if min == t.cron.min {
+		if min == _timer.min {
 			exist = true
 			break
 		}
@@ -119,7 +119,7 @@ func (t *Task) exec() {
 	// SECONDS
 	exist = false
 	for _, sec := range t._time[SECOND] {
-		if sec == t.cron.second {
+		if sec == _timer.second {
 			exist = true
 			break
 		}
